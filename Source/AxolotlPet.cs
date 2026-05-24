@@ -30,6 +30,10 @@ public class AxolotlPet : Entity {
     private CardinalDir currentDir = CardinalDir.W;
     private const float BaseMoveThreshold = 0.3f;
 
+    // Position freeze: hold pet in place until player exceeds min follow distance
+    private bool isHeld = false;
+    private Vector2 heldPosition;
+
     // Lateral nudge: pushes sprite to the side when pet is directly above/below player
     private float lateralNudge = 0f;
     private float verticalNudge = 0f;
@@ -125,14 +129,32 @@ public class AxolotlPet : Entity {
             AttachToPlayer();
         }
 
-        // Min move distance: pet stays idle until player is at least this far away
-        float minDist = MountainPetModule.Settings?.MinMoveDistance ?? 3f;
+        // Min move distance: pet freezes in place until player is at least this far away
+        float minDist = MountainPetModule.Settings?.MinMoveDistance ?? 28f;
         Player playerForDist = Scene?.Tracker.GetEntity<Player>();
         float distToPlayer = playerForDist != null ? (playerForDist.Position - Position).Length() : float.MaxValue;
 
+        // Position freeze logic
+        if (distToPlayer < minDist) {
+            if (!isHeld) {
+                // Start holding — remember where we are
+                isHeld = true;
+                heldPosition = Position;
+            }
+            // Snap back to held position (override follower system)
+            Position = heldPosition;
+        } else {
+            // Player is far enough — release the hold
+            isHeld = false;
+        }
+
+        // Recalculate distance after potential position override
+        if (playerForDist != null)
+            distToPlayer = (playerForDist.Position - Position).Length();
+
         Vector2 velocity = Position - lastPosition;
         float speed = velocity.Length();
-        bool isMoving = speed >= BaseMoveThreshold && distToPlayer >= minDist;
+        bool isMoving = speed >= BaseMoveThreshold && !isHeld;
 
         if (isMoving) {
             float targetAngle = VelocityToAngle(velocity);
@@ -207,16 +229,17 @@ public class AxolotlPet : Entity {
                     break;
             }
         } else {
-            // Not moving (or within min follow distance)
+            // Not moving (or held in place)
             if (animState != PetAnimState.Idle) {
                 animState = PetAnimState.Idle;
                 sprite.Play("idle");
             }
-            // Still flip the idle sprite based on player direction
-            if (speed >= BaseMoveThreshold && playerForDist != null) {
+            // Still flip the idle sprite to face toward the player
+            if (playerForDist != null) {
                 Vector2 toPlayer = playerForDist.Position - Position;
                 if (MathF.Abs(toPlayer.X) > 1f) {
-                    CardinalDir facingDir = ClassifyCardinal(velocity);
+                    // Face toward the player
+                    CardinalDir facingDir = ClassifyCardinal(toPlayer);
                     ApplyFlip(facingDir);
                 }
             }

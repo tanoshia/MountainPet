@@ -1,0 +1,43 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Everest lib-stripped
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: EverestAPI/Everest
+        latest: true
+        fileName: lib-stripped.zip
+
+    - name: Unzip lib-stripped
+      run: unzip lib-stripped.zip -d lib-stripped
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore Source/MountainPet.csproj
+
+    - name: Build (Release)
+      run: dotnet build Source/MountainPet.csproj -c Release /p:CelestePrefix=${{ github.workspace }}/lib-stripped
+
+    - name: Verify zip was created
+      run: ls -la MountainPet.zip
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: MountainPet.zip
+        fail_on_unmatched_files: true
+        generate_release_notes: true
