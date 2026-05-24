@@ -28,17 +28,24 @@ public class AxolotlPet : Entity {
     private Vector2 lastPosition;
     private PetAnimState animState = PetAnimState.Idle;
     private CardinalDir currentDir = CardinalDir.W;
-    private const float MoveThreshold = 0.3f;
+    private const float BaseMoveThreshold = 0.3f;
 
     // Lateral nudge: pushes sprite to the side when pet is directly above/below player
     private float lateralNudge = 0f;
     private float verticalNudge = 0f;
-    private float nudgeSide = 1f; // 1 = right, -1 = left
+
+    // Smooth turning: arc offset when direction changes sharply
+    private float displayAngle = 270f; // Current visual angle (degrees, 0=N, 90=E, 180=S, 270=W)
+    private float arcOffsetX = 0f;
+    private float arcOffsetY = 0f;
+    private const float ArcDecayRate = 6f; // How fast arc offset decays back to zero
 
     // Read from settings (with fallback defaults)
     private float NudgeMaxDistance => MountainPetModule.Settings?.NudgeMaxDistance ?? 24f;
-    private float NudgeMaxOffset => MountainPetModule.Settings?.NudgeMaxOffset ?? 6f;
+    private float NudgeMaxOffset => MountainPetModule.Settings?.NudgeMaxOffset ?? 10f;
     private float NudgeLerpSpeed => MountainPetModule.Settings?.NudgeSpeed ?? 8f;
+    private float TurnRadius => MountainPetModule.Settings?.TurnRadius ?? 6f;
+    private float TurnSpeed => MountainPetModule.Settings?.TurnSpeed ?? 4f;
 
     public AxolotlPet()
         : base(Vector2.Zero) {
@@ -118,15 +125,64 @@ public class AxolotlPet : Entity {
             AttachToPlayer();
         }
 
+        // Min move distance: pet stays idle until player is at least this far away
+        float minDist = MountainPetModule.Settings?.MinMoveDistance ?? 3f;
+        Player playerForDist = Scene?.Tracker.GetEntity<Player>();
+        float distToPlayer = playerForDist != null ? (playerForDist.Position - Position).Length() : float.MaxValue;
+
         Vector2 velocity = Position - lastPosition;
         float speed = velocity.Length();
-        bool isMoving = speed >= MoveThreshold;
+        bool isMoving = speed >= BaseMoveThreshold && distToPlayer >= minDist;
 
-        switch (animState) {
-            case PetAnimState.Idle:
-            case PetAnimState.Rest:
-                if (isMoving) {
-                    currentDir = ClassifyCardinal(velocity);
+        if (isMoving) {
+            float targetAngle = VelocityToAngle(velocity);
+            CardinalDir displayDir;
+
+            if (MountainPetModule.Settings?.SmoothTurning == true) {
+                // Smooth turning: rotate displayAngle toward target with max turn rate
+                float angleDiff = AngleDifference(displayAngle, targetAngle);
+
+                // Turn rate scales with:
+                // 1. TurnSpeed setting (base rate)
+                // 2. Pet's current speed (faster movement = faster turning)
+                // 3. Distance to player (further away = faster turning to catch up)
+                float speedFactor = MathHelper.Clamp(speed / 3f, 0.5f, 3f); // normalize around typical speed
+                float turnDistFactor = MathHelper.Clamp(distToPlayer / 40f, 0.5f, 3f); // normalize: 40px = 1x
+                float maxTurnPerFrame = 180f * TurnSpeed * speedFactor * turnDistFactor * Engine.DeltaTime;
+
+                if (MathF.Abs(angleDiff) <= maxTurnPerFrame) {
+                    displayAngle = targetAngle;
+                } else {
+                    displayAngle += MathF.Sign(angleDiff) * maxTurnPerFrame;
+                    displayAngle = NormalizeAngle(displayAngle);
+                }
+
+                // Arc offset: push perpendicular to movement during turns
+                // Offset goes opposite to turn direction so the HEAD stays on path
+                // and the TAIL swings outward (like a fish turning)
+                float turnStrength = MathHelper.Clamp(MathF.Abs(angleDiff) / 90f, 0f, 1f);
+                float perpAngleRad = (displayAngle - 90f * MathF.Sign(angleDiff)) * (MathF.PI / 180f);
+                float arcTarget = turnStrength * TurnRadius;
+                // Perpendicular direction (90° to display angle, in the turn direction)
+                float perpX = MathF.Sin(perpAngleRad) * arcTarget;
+                float perpY = -MathF.Cos(perpAngleRad) * arcTarget;
+
+                arcOffsetX = MathHelper.Lerp(arcOffsetX, perpX, ArcDecayRate * Engine.DeltaTime);
+                arcOffsetY = MathHelper.Lerp(arcOffsetY, perpY, ArcDecayRate * Engine.DeltaTime);
+
+                displayDir = AngleToCardinal(displayAngle);
+            } else {
+                // Instant turning (original behavior)
+                displayAngle = targetAngle;
+                displayDir = ClassifyCardinal(velocity);
+                arcOffsetX = 0f;
+                arcOffsetY = 0f;
+            }
+
+            switch (animState) {
+                case PetAnimState.Idle:
+                case PetAnimState.Rest:
+                    currentDir = displayDir;
                     if (petInfo.HasTransition && petInfo.TransitionAnimPath != null
                         && sprite.Animations.ContainsKey(petInfo.TransitionAnimPath)) {
                         animState = PetAnimState.TransitionToSwim;
@@ -136,48 +192,54 @@ public class AxolotlPet : Entity {
                         animState = PetAnimState.Swimming;
                         PlaySwimAnim(currentDir);
                     }
-                }
-                break;
+                    break;
 
-            case PetAnimState.TransitionToSwim:
-                if (!isMoving) {
-                    animState = PetAnimState.Idle;
-                    sprite.Play("idle");
-                } else {
-                    currentDir = ClassifyCardinal(velocity);
+                case PetAnimState.TransitionToSwim:
+                    currentDir = displayDir;
                     ApplyFlip(currentDir);
-                }
-                break;
+                    break;
 
-            case PetAnimState.Swimming:
-                if (!isMoving) {
-                    animState = PetAnimState.Idle;
-                    sprite.Play("idle");
-                } else {
-                    CardinalDir newDir = ClassifyCardinal(velocity);
-                    if (newDir != currentDir) {
-                        currentDir = newDir;
+                case PetAnimState.Swimming:
+                    if (displayDir != currentDir) {
+                        currentDir = displayDir;
                         PlaySwimAnim(currentDir);
                     }
+                    break;
+            }
+        } else {
+            // Not moving (or within min follow distance)
+            if (animState != PetAnimState.Idle) {
+                animState = PetAnimState.Idle;
+                sprite.Play("idle");
+            }
+            // Still flip the idle sprite based on player direction
+            if (speed >= BaseMoveThreshold && playerForDist != null) {
+                Vector2 toPlayer = playerForDist.Position - Position;
+                if (MathF.Abs(toPlayer.X) > 1f) {
+                    CardinalDir facingDir = ClassifyCardinal(velocity);
+                    ApplyFlip(facingDir);
                 }
-                break;
+            }
+            // Decay arc offset when stopped
+            arcOffsetX = Calc.Approach(arcOffsetX, 0f, ArcDecayRate * Engine.DeltaTime * TurnRadius);
+            arcOffsetY = Calc.Approach(arcOffsetY, 0f, ArcDecayRate * Engine.DeltaTime * TurnRadius);
         }
 
         lastPosition = Position;
 
         // Proximity nudge: push sprite away from player when too close
         ApplyProximityNudge();
+
+        // Combine arc offset with nudge offset
+        sprite.X = lateralNudge + arcOffsetX;
+        sprite.Y = verticalNudge + arcOffsetY;
     }
 
     private void ApplyProximityNudge() {
         // Check if nudge is disabled in settings
         if (MountainPetModule.Settings?.NudgeEnabled != true) {
-            if (lateralNudge != 0f || verticalNudge != 0f) {
-                lateralNudge = 0f;
-                verticalNudge = 0f;
-                sprite.X = 0f;
-                sprite.Y = 0f;
-            }
+            lateralNudge = 0f;
+            verticalNudge = 0f;
             return;
         }
 
@@ -187,58 +249,78 @@ public class AxolotlPet : Entity {
         if (player == null) {
             lateralNudge = Calc.Approach(lateralNudge, 0f, NudgeLerpSpeed * dt);
             verticalNudge = Calc.Approach(verticalNudge, 0f, NudgeLerpSpeed * dt);
-            sprite.X = lateralNudge;
-            sprite.Y = verticalNudge;
             return;
         }
 
         Vector2 toPlayer = player.Position - Position;
         float dist = toPlayer.Length();
-        float absX = MathF.Abs(toPlayer.X);
-        float absY = MathF.Abs(toPlayer.Y);
 
         float maxDist = NudgeMaxDistance;
         float maxOffset = NudgeMaxOffset;
         float speed = NudgeLerpSpeed;
 
         if (dist > 0.1f && dist < maxDist) {
-            // Distance factor: stronger when closer (1 at dist=0, 0 at maxDist)
             float distFactor = 1f - (dist / maxDist);
 
-            // --- Lateral nudge (horizontal push when vertically aligned) ---
-            bool tooVertical = absX < absY * 0.5f;
-            if (tooVertical) {
-                if (MathF.Abs(toPlayer.X) > 0.5f) {
-                    nudgeSide = toPlayer.X > 0 ? -1f : 1f;
-                }
-                float alignFactor = 1f - MathHelper.Clamp(absX / (absY * 0.5f + 0.01f), 0f, 1f);
-                float targetLateral = nudgeSide * maxOffset * distFactor * alignFactor;
-                lateralNudge = MathHelper.Lerp(lateralNudge, targetLateral, speed * dt);
-            } else {
-                lateralNudge = Calc.Approach(lateralNudge, 0f, speed * dt * 2f);
-            }
+            // Compute the "away from player" angle
+            // toPlayer points toward player, so we want the opposite direction
+            float awayAngle = MathF.Atan2(-toPlayer.X, toPlayer.Y) * (180f / MathF.PI);
+            // Normalize to 0-360 (0=N, 90=E, 180=S, 270=W)
+            if (awayAngle < 0f) awayAngle += 360f;
 
-            // --- Vertical nudge (push away when directly behind / overlapping) ---
-            // Activates when pet is very close horizontally (within the "body column")
-            bool tooClose = absX < 8f && absY < maxDist;
-            if (tooClose) {
-                // Push away from player vertically
-                float vertDir = toPlayer.Y > 0 ? -1f : 1f; // Push opposite to player
-                // Stronger when more horizontally aligned (directly behind)
-                float hAlignFactor = 1f - MathHelper.Clamp(absX / 8f, 0f, 1f);
-                float targetVertical = vertDir * maxOffset * distFactor * hAlignFactor;
-                verticalNudge = MathHelper.Lerp(verticalNudge, targetVertical, speed * dt);
-            } else {
-                verticalNudge = Calc.Approach(verticalNudge, 0f, speed * dt * 2f);
-            }
+            // Clamp the away angle to avoid dead zones:
+            // Dead zone: ±30° of North (330-360, 0-30) and ±45° of South (135-225)
+            awayAngle = ClampNudgeAngle(awayAngle);
+
+            // Convert clamped angle to X/Y offset
+            float angleRad = awayAngle * (MathF.PI / 180f);
+            float targetX = MathF.Sin(angleRad) * maxOffset * distFactor;
+            float targetY = -MathF.Cos(angleRad) * maxOffset * distFactor;
+
+            // How close to the player's vertical axis? Stronger nudge when more aligned
+            float absX = MathF.Abs(toPlayer.X);
+            float absY = MathF.Abs(toPlayer.Y);
+            float alignFactor = 1f - MathHelper.Clamp(absX / (maxDist * 0.5f), 0f, 1f);
+
+            targetX *= alignFactor;
+            targetY *= alignFactor;
+
+            lateralNudge = MathHelper.Lerp(lateralNudge, targetX, speed * dt);
+            verticalNudge = MathHelper.Lerp(verticalNudge, targetY, speed * dt);
         } else {
-            // Outside range — ease both back to zero
             lateralNudge = Calc.Approach(lateralNudge, 0f, speed * dt * 2f);
             verticalNudge = Calc.Approach(verticalNudge, 0f, speed * dt * 2f);
         }
+    }
 
-        sprite.X = lateralNudge;
-        sprite.Y = verticalNudge;
+    /// <summary>
+    /// Clamps a nudge angle away from dead zones (above and below player).
+    /// Dead zones: ±30° of North (0°), ±45° of South (180°).
+    /// Pushes toward the nearest side (East=90° or West=270°).
+    /// </summary>
+    private static float ClampNudgeAngle(float angle) {
+        // North dead zone: 330-360 and 0-30 → push to nearest side
+        if (angle < 30f) {
+            // 0-30: push toward East (90)
+            return 30f + (90f - 30f) * (angle / 30f); // remap 0-30 → 30-90 (bias toward 90)
+        }
+        if (angle > 330f) {
+            // 330-360: push toward West (270)
+            return 330f - (330f - 270f) * ((360f - angle) / 30f); // remap 330-360 → 270-330 (bias toward 270)
+        }
+
+        // South dead zone: 135-225 → push to nearest side
+        if (angle >= 135f && angle <= 180f) {
+            // 135-180: push toward East (90)
+            return 135f - (135f - 90f) * ((angle - 135f) / 45f); // remap 135-180 → 135-90 (bias toward 90)
+        }
+        if (angle > 180f && angle <= 225f) {
+            // 180-225: push toward West (270)
+            return 225f + (270f - 225f) * ((angle - 180f) / 45f); // remap 180-225 → 225-270 (bias toward 270)
+        }
+
+        // Outside dead zones — angle is fine
+        return angle;
     }
 
     private void OnAnimationFinish(string animId) {
@@ -265,11 +347,24 @@ public class AxolotlPet : Entity {
     }
 
     public static CardinalDir ClassifyCardinal(Vector2 velocity) {
-        // Clock-style: 0°=N, 90°=E, 180°=S, 270°=W
+        float angle = VelocityToAngle(velocity);
+        return AngleToCardinal(angle);
+    }
+
+    /// <summary>
+    /// Converts a velocity vector to an angle in degrees (0=N, 90=E, 180=S, 270=W).
+    /// </summary>
+    private static float VelocityToAngle(Vector2 velocity) {
         float angle = MathF.Atan2(velocity.X, -velocity.Y) * (180f / MathF.PI);
         if (angle < 0) angle += 360f;
+        return angle;
+    }
 
-        // 16 sectors of 22.5° each
+    /// <summary>
+    /// Converts an angle (0=N, 90=E, 180=S, 270=W) to a CardinalDir.
+    /// </summary>
+    private static CardinalDir AngleToCardinal(float angle) {
+        angle = NormalizeAngle(angle);
         if (angle >= 348.75f || angle < 11.25f) return CardinalDir.N;
         if (angle >= 11.25f && angle < 33.75f) return CardinalDir.NNE;
         if (angle >= 33.75f && angle < 56.25f) return CardinalDir.NE;
@@ -285,7 +380,26 @@ public class AxolotlPet : Entity {
         if (angle >= 258.75f && angle < 281.25f) return CardinalDir.W;
         if (angle >= 281.25f && angle < 303.75f) return CardinalDir.NWW;
         if (angle >= 303.75f && angle < 326.25f) return CardinalDir.NW;
-        return CardinalDir.NNW; // 326.25 - 348.75
+        return CardinalDir.NNW;
+    }
+
+    /// <summary>
+    /// Shortest signed angle difference from 'from' to 'to' (result in -180..180).
+    /// </summary>
+    private static float AngleDifference(float from, float to) {
+        float diff = NormalizeAngle(to) - NormalizeAngle(from);
+        if (diff > 180f) diff -= 360f;
+        if (diff < -180f) diff += 360f;
+        return diff;
+    }
+
+    /// <summary>
+    /// Normalizes angle to 0..360 range.
+    /// </summary>
+    private static float NormalizeAngle(float angle) {
+        angle %= 360f;
+        if (angle < 0f) angle += 360f;
+        return angle;
     }
 
     public void ResetVelocityTracking() {

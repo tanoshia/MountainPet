@@ -131,33 +131,101 @@ public class MountainPetModule : EverestModule {
                 Settings.PetLight = val;
             }));
 
-        // Nudge away from player — expandable section
-        var nudgeDistSlider = new TextMenu.Slider("  Nudge Trigger Radius",
+        // Min Follow Distance — top-level setting (not in Advanced)
+        menu.Add(new TextMenu.Slider("Min Follow Distance (default 28)",
+            i => $"{i}px", 12, 48, Settings.MinMoveDistance)
+            .Change(val => { Settings.MinMoveDistance = val; }));
+
+        // === Advanced section (clickable expand/collapse) ===
+        // All advanced sub-items
+        var advancedItems = new List<TextMenu.Item>();
+
+        // -- Nudge settings --
+        var nudgeToggle = new TextMenu.OnOff("  Nudge Away From Player", Settings.NudgeEnabled);
+        advancedItems.Add(nudgeToggle);
+
+        var nudgeDistSlider = new TextMenu.Slider("    Trigger Radius",
             i => $"{i}px", 4, 64, Settings.NudgeMaxDistance);
         nudgeDistSlider.Change(val => { Settings.NudgeMaxDistance = val; });
         nudgeDistSlider.Visible = Settings.NudgeEnabled;
+        advancedItems.Add(nudgeDistSlider);
 
-        var nudgeOffsetSlider = new TextMenu.Slider("  Nudge Offset",
+        var nudgeOffsetSlider = new TextMenu.Slider("    Offset",
             i => $"{i}px", 2, 32, Settings.NudgeMaxOffset);
         nudgeOffsetSlider.Change(val => { Settings.NudgeMaxOffset = val; });
         nudgeOffsetSlider.Visible = Settings.NudgeEnabled;
+        advancedItems.Add(nudgeOffsetSlider);
 
-        var nudgeSpeedSlider = new TextMenu.Slider("  Nudge Speed",
+        var nudgeSpeedSlider = new TextMenu.Slider("    Speed",
             i => $"{i}", 1, 16, Settings.NudgeSpeed);
         nudgeSpeedSlider.Change(val => { Settings.NudgeSpeed = val; });
         nudgeSpeedSlider.Visible = Settings.NudgeEnabled;
+        advancedItems.Add(nudgeSpeedSlider);
 
-        menu.Add(new TextMenu.OnOff("Nudge Away From Player", Settings.NudgeEnabled)
-            .Change(val => {
-                Settings.NudgeEnabled = val;
-                nudgeDistSlider.Visible = val;
-                nudgeOffsetSlider.Visible = val;
-                nudgeSpeedSlider.Visible = val;
-            }));
+        nudgeToggle.Change(val => {
+            Settings.NudgeEnabled = val;
+            nudgeDistSlider.Visible = val && Settings.AdvancedExpanded;
+            nudgeOffsetSlider.Visible = val && Settings.AdvancedExpanded;
+            nudgeSpeedSlider.Visible = val && Settings.AdvancedExpanded;
+        });
 
-        menu.Add(nudgeDistSlider);
-        menu.Add(nudgeOffsetSlider);
-        menu.Add(nudgeSpeedSlider);
+        // -- Smooth turning settings --
+        var turnToggle = new TextMenu.OnOff("  Smooth Turning", Settings.SmoothTurning);
+        advancedItems.Add(turnToggle);
+
+        var turnRadiusSlider = new TextMenu.Slider("    Turn Radius",
+            i => $"{i}px", 2, 64, Settings.TurnRadius);
+        turnRadiusSlider.Change(val => { Settings.TurnRadius = val; });
+        turnRadiusSlider.Visible = Settings.SmoothTurning;
+        advancedItems.Add(turnRadiusSlider);
+
+        var turnSpeedSlider = new TextMenu.Slider("    Turn Speed",
+            i => $"{i}", 1, 20, Settings.TurnSpeed);
+        turnSpeedSlider.Change(val => { Settings.TurnSpeed = val; });
+        turnSpeedSlider.Visible = Settings.SmoothTurning;
+        advancedItems.Add(turnSpeedSlider);
+
+        turnToggle.Change(val => {
+            Settings.SmoothTurning = val;
+            turnRadiusSlider.Visible = val && Settings.AdvancedExpanded;
+            turnSpeedSlider.Visible = val && Settings.AdvancedExpanded;
+        });
+
+        // Set initial visibility based on expanded state
+        foreach (var item in advancedItems) {
+            // Sub-sliders that depend on their parent toggle keep their own logic;
+            // but all items are hidden if Advanced is collapsed
+            if (!Settings.AdvancedExpanded)
+                item.Visible = false;
+        }
+
+        // The clickable "Advanced" button
+        var advancedButton = new TextMenu.Button(
+            Settings.AdvancedExpanded ? "Advanced \u25b2" : "Advanced \u25bc");
+        advancedButton.Pressed(() => {
+            Settings.AdvancedExpanded = !Settings.AdvancedExpanded;
+            advancedButton.Label = Settings.AdvancedExpanded ? "Advanced \u25b2" : "Advanced \u25bc";
+
+            if (Settings.AdvancedExpanded) {
+                // Show all top-level advanced items
+                nudgeToggle.Visible = true;
+                nudgeDistSlider.Visible = Settings.NudgeEnabled;
+                nudgeOffsetSlider.Visible = Settings.NudgeEnabled;
+                nudgeSpeedSlider.Visible = Settings.NudgeEnabled;
+                turnToggle.Visible = true;
+                turnRadiusSlider.Visible = Settings.SmoothTurning;
+                turnSpeedSlider.Visible = Settings.SmoothTurning;
+            } else {
+                // Hide everything
+                foreach (var item in advancedItems)
+                    item.Visible = false;
+            }
+        });
+        menu.Add(advancedButton);
+
+        // Add all advanced items to menu
+        foreach (var item in advancedItems)
+            menu.Add(item);
     }
 
     private void OnLoadLevel(Level level, Player.IntroTypes playerIntro, bool isFromLoader) {

@@ -20,11 +20,29 @@ public class MountainPetModuleSettings : EverestModuleSettings {
     public bool NudgeEnabled { get; set; } = true;
 
     [SettingIgnore]
-    public int NudgeMaxDistance { get; set; } = 24;  // trigger radius in pixels
+    public int NudgeMaxDistance { get; set; } = 24;
 
     [SettingIgnore]
-    public int NudgeMaxOffset { get; set; } = 10;   // max push in pixels
+    public int NudgeMaxOffset { get; set; } = 10;
 
     [SettingIgnore]
-    public int NudgeSpeed { get; set; } = 8;        // lerp speed multiplier
+    public int NudgeSpeed { get; set; } = 8;
+
+    // Follow behavior
+    [SettingIgnore]
+    public int MinMoveDistance { get; set; } = 28;  // min px from player before pet reacts
+
+    // Smooth turning settings
+    [SettingIgnore]
+    public bool SmoothTurning { get; set; } = true;
+
+    [SettingIgnore]
+    public int TurnRadius { get; set; } = 6;  // pixels of arc offset
+
+    [SettingIgnore]
+    public int TurnSpeed { get; set; } = 4;   // turn rate multiplier
+
+    // Track whether Advanced section is expanded (not persisted to file, but harmless)
+    [SettingIgnore]
+    public bool AdvancedExpanded { get; set; } = false;
 }
