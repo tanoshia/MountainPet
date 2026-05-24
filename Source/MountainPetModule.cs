@@ -130,6 +130,34 @@ public class MountainPetModule : EverestModule {
             .Change(val => {
                 Settings.PetLight = val;
             }));
+
+        // Nudge away from player — expandable section
+        var nudgeDistSlider = new TextMenu.Slider("  Nudge Trigger Radius",
+            i => $"{i}px", 4, 64, Settings.NudgeMaxDistance);
+        nudgeDistSlider.Change(val => { Settings.NudgeMaxDistance = val; });
+        nudgeDistSlider.Visible = Settings.NudgeEnabled;
+
+        var nudgeOffsetSlider = new TextMenu.Slider("  Nudge Offset",
+            i => $"{i}px", 2, 32, Settings.NudgeMaxOffset);
+        nudgeOffsetSlider.Change(val => { Settings.NudgeMaxOffset = val; });
+        nudgeOffsetSlider.Visible = Settings.NudgeEnabled;
+
+        var nudgeSpeedSlider = new TextMenu.Slider("  Nudge Speed",
+            i => $"{i}", 1, 16, Settings.NudgeSpeed);
+        nudgeSpeedSlider.Change(val => { Settings.NudgeSpeed = val; });
+        nudgeSpeedSlider.Visible = Settings.NudgeEnabled;
+
+        menu.Add(new TextMenu.OnOff("Nudge Away From Player", Settings.NudgeEnabled)
+            .Change(val => {
+                Settings.NudgeEnabled = val;
+                nudgeDistSlider.Visible = val;
+                nudgeOffsetSlider.Visible = val;
+                nudgeSpeedSlider.Visible = val;
+            }));
+
+        menu.Add(nudgeDistSlider);
+        menu.Add(nudgeOffsetSlider);
+        menu.Add(nudgeSpeedSlider);
     }
 
     private void OnLoadLevel(Level level, Player.IntroTypes playerIntro, bool isFromLoader) {

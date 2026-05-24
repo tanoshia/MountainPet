@@ -1,13 +1,11 @@
-# MountainPet v0.2.2
+# MountainPet v0.3.0
 
 A cosmetic pet follower mod for Celeste. Adds a small axolotl companion that trails behind Madeline using the game's native follower system.
 
-## What's new in v0.2.2
+## What's new in v0.3.0
 
-- Axolotl now supports 16 swim directions (N, NNE, NE, NEE, E, SEE, SE, SSE, S, SSW, SW, SWW, W, NWW, NW, NNW)
-- 9 unique west-side direction sprites with FlipX mirroring for east-side
-- Added randomize color toggle
-- Multiple pet types (Axolotl, Goldfish) with data-driven registry
+- Pet gets nudged slightly when overlapping or positioned behind the player
+- Prevents visual clutter when standing still
 
 ## Features
 
@@ -15,6 +13,7 @@ A cosmetic pet follower mod for Celeste. Adds a small axolotl companion that tra
 - Directional swimming animations (16 directions)
 - Multiple pet types (Axolotl, Goldfish)
 - Color variants per pet type (16 axolotl colors)
+- Overlap/behind nudge for cleaner visuals
 - Always stays closest to the player in the follower chain
 - Works on all levels (vanilla + modded) — no map edits needed
 

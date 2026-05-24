@@ -30,6 +30,16 @@ public class AxolotlPet : Entity {
     private CardinalDir currentDir = CardinalDir.W;
     private const float MoveThreshold = 0.3f;
 
+    // Lateral nudge: pushes sprite to the side when pet is directly above/below player
+    private float lateralNudge = 0f;
+    private float verticalNudge = 0f;
+    private float nudgeSide = 1f; // 1 = right, -1 = left
+
+    // Read from settings (with fallback defaults)
+    private float NudgeMaxDistance => MountainPetModule.Settings?.NudgeMaxDistance ?? 24f;
+    private float NudgeMaxOffset => MountainPetModule.Settings?.NudgeMaxOffset ?? 6f;
+    private float NudgeLerpSpeed => MountainPetModule.Settings?.NudgeSpeed ?? 8f;
+
     public AxolotlPet()
         : base(Vector2.Zero) {
         Depth = 1;
@@ -154,6 +164,81 @@ public class AxolotlPet : Entity {
         }
 
         lastPosition = Position;
+
+        // Proximity nudge: push sprite away from player when too close
+        ApplyProximityNudge();
+    }
+
+    private void ApplyProximityNudge() {
+        // Check if nudge is disabled in settings
+        if (MountainPetModule.Settings?.NudgeEnabled != true) {
+            if (lateralNudge != 0f || verticalNudge != 0f) {
+                lateralNudge = 0f;
+                verticalNudge = 0f;
+                sprite.X = 0f;
+                sprite.Y = 0f;
+            }
+            return;
+        }
+
+        Player player = Scene?.Tracker.GetEntity<Player>();
+        float dt = Engine.DeltaTime;
+
+        if (player == null) {
+            lateralNudge = Calc.Approach(lateralNudge, 0f, NudgeLerpSpeed * dt);
+            verticalNudge = Calc.Approach(verticalNudge, 0f, NudgeLerpSpeed * dt);
+            sprite.X = lateralNudge;
+            sprite.Y = verticalNudge;
+            return;
+        }
+
+        Vector2 toPlayer = player.Position - Position;
+        float dist = toPlayer.Length();
+        float absX = MathF.Abs(toPlayer.X);
+        float absY = MathF.Abs(toPlayer.Y);
+
+        float maxDist = NudgeMaxDistance;
+        float maxOffset = NudgeMaxOffset;
+        float speed = NudgeLerpSpeed;
+
+        if (dist > 0.1f && dist < maxDist) {
+            // Distance factor: stronger when closer (1 at dist=0, 0 at maxDist)
+            float distFactor = 1f - (dist / maxDist);
+
+            // --- Lateral nudge (horizontal push when vertically aligned) ---
+            bool tooVertical = absX < absY * 0.5f;
+            if (tooVertical) {
+                if (MathF.Abs(toPlayer.X) > 0.5f) {
+                    nudgeSide = toPlayer.X > 0 ? -1f : 1f;
+                }
+                float alignFactor = 1f - MathHelper.Clamp(absX / (absY * 0.5f + 0.01f), 0f, 1f);
+                float targetLateral = nudgeSide * maxOffset * distFactor * alignFactor;
+                lateralNudge = MathHelper.Lerp(lateralNudge, targetLateral, speed * dt);
+            } else {
+                lateralNudge = Calc.Approach(lateralNudge, 0f, speed * dt * 2f);
+            }
+
+            // --- Vertical nudge (push away when directly behind / overlapping) ---
+            // Activates when pet is very close horizontally (within the "body column")
+            bool tooClose = absX < 8f && absY < maxDist;
+            if (tooClose) {
+                // Push away from player vertically
+                float vertDir = toPlayer.Y > 0 ? -1f : 1f; // Push opposite to player
+                // Stronger when more horizontally aligned (directly behind)
+                float hAlignFactor = 1f - MathHelper.Clamp(absX / 8f, 0f, 1f);
+                float targetVertical = vertDir * maxOffset * distFactor * hAlignFactor;
+                verticalNudge = MathHelper.Lerp(verticalNudge, targetVertical, speed * dt);
+            } else {
+                verticalNudge = Calc.Approach(verticalNudge, 0f, speed * dt * 2f);
+            }
+        } else {
+            // Outside range — ease both back to zero
+            lateralNudge = Calc.Approach(lateralNudge, 0f, speed * dt * 2f);
+            verticalNudge = Calc.Approach(verticalNudge, 0f, speed * dt * 2f);
+        }
+
+        sprite.X = lateralNudge;
+        sprite.Y = verticalNudge;
     }
 
     private void OnAnimationFinish(string animId) {

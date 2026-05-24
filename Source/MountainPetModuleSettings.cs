@@ -14,4 +14,17 @@ public class MountainPetModuleSettings : EverestModuleSettings {
 
     [SettingIgnore]
     public bool PetLight { get; set; } = false;
+
+    // Proximity nudge settings
+    [SettingIgnore]
+    public bool NudgeEnabled { get; set; } = true;
+
+    [SettingIgnore]
+    public int NudgeMaxDistance { get; set; } = 24;  // trigger radius in pixels
+
+    [SettingIgnore]
+    public int NudgeMaxOffset { get; set; } = 10;   // max push in pixels
+
+    [SettingIgnore]
+    public int NudgeSpeed { get; set; } = 8;        // lerp speed multiplier
 }
