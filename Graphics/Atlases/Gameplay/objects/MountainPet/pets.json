@@ -1,0 +1,78 @@
+{
+  "pets": [
+    {
+      "id": "axolotl",
+      "name": "Axolotl",
+      "folder": "axolotl",
+      "facing": "west",
+      "animations": {
+        "idle": { "frames": "0-1", "delay": 0.5 },
+        "rest": { "frames": "0-3", "delay": 0.15 },
+        "idle_to_swim": { "frames": "0-2", "delay": 0.06, "type": "oneshot", "path": "idle_to_W" },
+        "N": { "frames": "0-3", "delay": 0.08 },
+        "S": { "frames": "0-3", "delay": 0.08 },
+        "W": { "frames": "0-3", "delay": 0.08 },
+        "NW": { "frames": "0-3", "delay": 0.08 },
+        "SW": { "frames": "0-3", "delay": 0.08 }
+      },
+      "colors": [
+        { "folder": "tiny_axolotl_pink", "name": "Pink" },
+        { "folder": "tiny_axolotl_albino", "name": "Albino" },
+        { "folder": "tiny_axolotl_black", "name": "Black" },
+        { "folder": "tiny_axolotl_blue00", "name": "Blue" },
+        { "folder": "tiny_axolotl_blue01", "name": "Sky Blue" },
+        { "folder": "tiny_axolotl_brown", "name": "Brown" },
+        { "folder": "tiny_axolotl_dark-orange", "name": "Dark Orange" },
+        { "folder": "tiny_axolotl_dark-purple", "name": "Dark Purple" },
+        { "folder": "tiny_axolotl_greyscale", "name": "Greyscale" },
+        { "folder": "tiny_axolotl_red", "name": "Red" },
+        { "folder": "tiny_axolotl_retrogreen", "name": "Retro Green" },
+        { "folder": "tiny_axolotl_rose-pink", "name": "Rose Pink" },
+        { "folder": "tiny_axolotl_swamp-green", "name": "Swamp Green" },
+        { "folder": "tiny_axolotl_tan", "name": "Tan" },
+        { "folder": "tiny_axolotl_yellow", "name": "Yellow" },
+        { "folder": "tiny_axolotl_yellow-green", "name": "Yellow Green" }
+      ]
+    },
+    {
+      "id": "fish",
+      "name": "Goldfish",
+      "folder": "fish",
+      "facing": "east",
+      "animations": {
+        "idle": { "frames": "0", "delay": 0.5 },
+        "E": { "frames": "0", "delay": 0.08 },
+        "NE": { "frames": "0", "delay": 0.08 },
+        "SE": { "frames": "0", "delay": 0.08 }
+      },
+      "colors": [
+        { "folder": "", "name": "Default" }
+      ]
+    },
+    {
+      "id": "debug_arrow",
+      "name": "Debug Arrow",
+      "folder": "debug_arrow",
+      "facing": "east",
+      "animations": {
+        "idle": { "frames": "0", "delay": 0.5 },
+        "N": { "frames": "0", "delay": 0.08 },
+        "NNE": { "frames": "0", "delay": 0.08 },
+        "NEE": { "frames": "0", "delay": 0.08 },
+        "E": { "frames": "0", "delay": 0.08 },
+        "SEE": { "frames": "0", "delay": 0.08 }
+        "SSE": { "frames": "0", "delay": 0.08 }
+        "S": { "frames": "0", "delay": 0.08 }
+      },
+      "colors": [
+        { "folder": "", "name": "Default" }
+      ]
+    }
+  ],
+  "_notes": {
+    "facing": "Which direction the base art faces. 'west' = art drawn facing left (FlipX for east). 'east' = art drawn facing right (FlipX for west). 'full' = separate art for all directions (no flipping needed).",
+    "animations": "Keys are animation IDs. Each pet type only needs to define the animations it has. The code falls back to the closest available direction if a specific one is missing.",
+    "colors": "Each color is a subfolder within the pet's folder. Empty string means sprites are directly in the pet folder (no color subfolders).",
+    "idle_to_swim": "One-shot transition animation. 'path' overrides the filename prefix if different from the animation ID."
+  }
+}
