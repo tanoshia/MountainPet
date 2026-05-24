@@ -9,10 +9,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_pink>
 
   <MountainPet_axolotl_tiny_axolotl_albino path="objects/MountainPet/axolotl/tiny_axolotl_albino/" start="idle">
@@ -21,10 +25,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_albino>
 
   <MountainPet_axolotl_tiny_axolotl_black path="objects/MountainPet/axolotl/tiny_axolotl_black/" start="idle">
@@ -33,10 +41,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_black>
 
   <MountainPet_axolotl_tiny_axolotl_blue00 path="objects/MountainPet/axolotl/tiny_axolotl_blue00/" start="idle">
@@ -45,10 +57,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_blue00>
 
   <MountainPet_axolotl_tiny_axolotl_blue01 path="objects/MountainPet/axolotl/tiny_axolotl_blue01/" start="idle">
@@ -57,10 +73,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_blue01>
 
   <MountainPet_axolotl_tiny_axolotl_brown path="objects/MountainPet/axolotl/tiny_axolotl_brown/" start="idle">
@@ -69,10 +89,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_brown>
 
   <MountainPet_axolotl_tiny_axolotl_dark-orange path="objects/MountainPet/axolotl/tiny_axolotl_dark-orange/" start="idle">
@@ -81,10 +105,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_dark-orange>
 
   <MountainPet_axolotl_tiny_axolotl_dark-purple path="objects/MountainPet/axolotl/tiny_axolotl_dark-purple/" start="idle">
@@ -93,10 +121,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_dark-purple>
 
   <MountainPet_axolotl_tiny_axolotl_greyscale path="objects/MountainPet/axolotl/tiny_axolotl_greyscale/" start="idle">
@@ -105,10 +137,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_greyscale>
 
   <MountainPet_axolotl_tiny_axolotl_red path="objects/MountainPet/axolotl/tiny_axolotl_red/" start="idle">
@@ -117,10 +153,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_red>
 
   <MountainPet_axolotl_tiny_axolotl_retrogreen path="objects/MountainPet/axolotl/tiny_axolotl_retrogreen/" start="idle">
@@ -129,10 +169,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_retrogreen>
 
   <MountainPet_axolotl_tiny_axolotl_rose-pink path="objects/MountainPet/axolotl/tiny_axolotl_rose-pink/" start="idle">
@@ -141,10 +185,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_rose-pink>
 
   <MountainPet_axolotl_tiny_axolotl_swamp-green path="objects/MountainPet/axolotl/tiny_axolotl_swamp-green/" start="idle">
@@ -153,10 +201,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_swamp-green>
 
   <MountainPet_axolotl_tiny_axolotl_tan path="objects/MountainPet/axolotl/tiny_axolotl_tan/" start="idle">
@@ -165,10 +217,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_tan>
 
   <MountainPet_axolotl_tiny_axolotl_yellow path="objects/MountainPet/axolotl/tiny_axolotl_yellow/" start="idle">
@@ -177,10 +233,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_yellow>
 
   <MountainPet_axolotl_tiny_axolotl_yellow-green path="objects/MountainPet/axolotl/tiny_axolotl_yellow-green/" start="idle">
@@ -189,10 +249,14 @@
     <Loop id="rest" path="rest" delay="0.15" frames="0-3"/>
     <Anim id="idle_to_W" path="idle_to_W" delay="0.06" frames="0-2"/>
     <Loop id="N" path="N" delay="0.08" frames="0-3"/>
-    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
-    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="NNW" path="NNW" delay="0.08" frames="0-3"/>
     <Loop id="NW" path="NW" delay="0.08" frames="0-3"/>
+    <Loop id="NWW" path="NWW" delay="0.08" frames="0-3"/>
+    <Loop id="W" path="W" delay="0.08" frames="0-3"/>
+    <Loop id="SWW" path="SWW" delay="0.08" frames="0-3"/>
     <Loop id="SW" path="SW" delay="0.08" frames="0-3"/>
+    <Loop id="SSW" path="SSW" delay="0.08" frames="0-3"/>
+    <Loop id="S" path="S" delay="0.08" frames="0-3"/>
   </MountainPet_axolotl_tiny_axolotl_yellow-green>
 
   <!-- Goldfish — east-facing, limited directions -->

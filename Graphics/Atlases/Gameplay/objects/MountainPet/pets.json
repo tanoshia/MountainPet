@@ -1,4 +1,5 @@
 {
+  "_note": "This file is REFERENCE ONLY. The actual registry is hardcoded in Source/PetRegistry.cs. Edit that file to change pet definitions.",
   "pets": [
     {
       "id": "axolotl",
@@ -8,12 +9,16 @@
       "animations": {
         "idle": { "frames": "0-1", "delay": 0.5 },
         "rest": { "frames": "0-3", "delay": 0.15 },
-        "idle_to_swim": { "frames": "0-2", "delay": 0.06, "type": "oneshot", "path": "idle_to_W" },
+        "idle_to_swim": { "path": "idle_to_W", "frames": "0-2", "delay": 0.06, "type": "oneshot" },
         "N": { "frames": "0-3", "delay": 0.08 },
-        "S": { "frames": "0-3", "delay": 0.08 },
-        "W": { "frames": "0-3", "delay": 0.08 },
+        "NNW": { "frames": "0-3", "delay": 0.08 },
         "NW": { "frames": "0-3", "delay": 0.08 },
-        "SW": { "frames": "0-3", "delay": 0.08 }
+        "NWW": { "frames": "0-3", "delay": 0.08 },
+        "W": { "frames": "0-3", "delay": 0.08 },
+        "SWW": { "frames": "0-3", "delay": 0.08 },
+        "SW": { "frames": "0-3", "delay": 0.08 },
+        "SSW": { "frames": "0-3", "delay": 0.08 },
+        "S": { "frames": "0-3", "delay": 0.08 }
       },
       "colors": [
         { "folder": "tiny_axolotl_pink", "name": "Pink" },
@@ -40,39 +45,54 @@
       "folder": "fish",
       "facing": "east",
       "animations": {
-        "idle": { "frames": "0", "delay": 0.5 },
+        "idle": { "path": "NE", "frames": "0", "delay": 0.5 },
         "E": { "frames": "0", "delay": 0.08 },
         "NE": { "frames": "0", "delay": 0.08 },
         "SE": { "frames": "0", "delay": 0.08 }
+      },
+      "colors": [
+        { "folder": "fish_red", "name": "Red" },
+        { "folder": "fish_blue", "name": "Blue" }
+      ]
+    },
+    {
+      "id": "debug_arrows",
+      "name": "Debug Arrows",
+      "folder": "debug_arrows",
+      "facing": "east",
+      "animations": {
+        "idle": { "path": "E", "frames": "0", "delay": 0.5 },
+        "N": { "frames": "0", "delay": 0.08 },
+        "NNE": { "frames": "0", "delay": 0.08 },
+        "NE": { "frames": "0", "delay": 0.08 },
+        "NEE": { "frames": "0", "delay": 0.08 },
+        "E": { "frames": "0", "delay": 0.08 },
+        "SEE": { "frames": "0", "delay": 0.08 },
+        "SE": { "frames": "0", "delay": 0.08 },
+        "SSE": { "frames": "0", "delay": 0.08 },
+        "S": { "frames": "0", "delay": 0.08 }
       },
       "colors": [
         { "folder": "", "name": "Default" }
       ]
     },
     {
-      "id": "debug_arrow",
-      "name": "Debug Arrow",
-      "folder": "debug_arrow",
-      "facing": "east",
+      "id": "luma",
+      "name": "Luma",
+      "folder": "luma",
+      "facing": "west",
       "animations": {
-        "idle": { "frames": "0", "delay": 0.5 },
-        "N": { "frames": "0", "delay": 0.08 },
-        "NNE": { "frames": "0", "delay": 0.08 },
-        "NEE": { "frames": "0", "delay": 0.08 },
-        "E": { "frames": "0", "delay": 0.08 },
-        "SEE": { "frames": "0", "delay": 0.08 }
-        "SSE": { "frames": "0", "delay": 0.08 }
-        "S": { "frames": "0", "delay": 0.08 }
+        "idle": { "frames": "0-1", "delay": 0.5 }
       },
       "colors": [
-        { "folder": "", "name": "Default" }
+        { "folder": "luma_yellow", "name": "Yellow" },
+        { "folder": "luma_beige", "name": "Beige" },
+        { "folder": "luma_black", "name": "Black" },
+        { "folder": "luma_blue", "name": "Blue" },
+        { "folder": "luma_pink", "name": "Pink" },
+        { "folder": "luma_red", "name": "Red" },
+        { "folder": "luma_white", "name": "White" }
       ]
     }
-  ],
-  "_notes": {
-    "facing": "Which direction the base art faces. 'west' = art drawn facing left (FlipX for east). 'east' = art drawn facing right (FlipX for west). 'full' = separate art for all directions (no flipping needed).",
-    "animations": "Keys are animation IDs. Each pet type only needs to define the animations it has. The code falls back to the closest available direction if a specific one is missing.",
-    "colors": "Each color is a subfolder within the pet's folder. Empty string means sprites are directly in the pet folder (no color subfolders).",
-    "idle_to_swim": "One-shot transition animation. 'path' overrides the filename prefix if different from the animation ID."
-  }
+  ]
 }

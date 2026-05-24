@@ -13,7 +13,7 @@ public enum PetAnimState {
 }
 
 public enum CardinalDir {
-    N, NE, E, SE, S, SW, W, NW
+    N, NNE, NE, NEE, E, SEE, SE, SSE, S, SSW, SW, SWW, W, NWW, NW, NNW
 }
 
 [Tracked]
@@ -21,7 +21,7 @@ public class AxolotlPet : Entity {
     private Follower follower;
     private Sprite sprite;
 
-    // Pet type info (resolved at spawn)
+    // Pet type info (resolved at spawn from settings + registry)
     private PetTypeInfo petInfo;
 
     // Animation state
@@ -38,61 +38,61 @@ public class AxolotlPet : Entity {
         follower = new Follower();
         Add(follower);
 
-        // Resolve pet type and color from settings
+        // Resolve pet type and color from settings + registry
         petInfo = ResolvePetInfo();
-        string spriteBankId = ResolveSpriteBankId();
+        var color = ResolveColor(petInfo);
 
         try {
-            sprite = GFX.SpriteBank.Create(spriteBankId);
+            sprite = PetRegistry.BuildSprite(petInfo, color);
         } catch (Exception e) {
             Logger.Log(LogLevel.Error, "MountainPet",
-                $"Failed to create sprite '{spriteBankId}': {e.Message}. Falling back.");
-            // Fallback to first axolotl color
-            try {
-                sprite = GFX.SpriteBank.Create("MountainPet_axolotl_tiny_axolotl_pink");
-                petInfo = PetRegistry.GetPet("axolotl");
-            } catch {
-                sprite = new Sprite(GFX.Game, "objects/MountainPet/axolotl/tiny_axolotl_pink/");
-                sprite.AddLoop("idle", "idle", 0.5f);
-                sprite.CenterOrigin();
-                sprite.Play("idle");
-                petInfo = PetRegistry.GetPet("axolotl");
-            }
+                $"Failed to build sprite for {petInfo.Id}/{color.Folder}: {e.Message}");
+            // Fallback: minimal sprite
+            sprite = new Sprite(GFX.Game, "objects/MountainPet/axolotl/tiny_axolotl_pink/");
+            sprite.AddLoop("idle", "idle", 0.5f);
+            sprite.CenterOrigin();
+            sprite.Play("idle");
+            petInfo = PetRegistry.GetPet("axolotl");
         }
 
         sprite.OnFinish = OnAnimationFinish;
         Add(sprite);
+
+        // Add light if setting is enabled
+        if (MountainPetModule.Settings?.PetLight == true) {
+            Add(new VertexLight(Color.White, 1f, 32, 64));
+        }
     }
 
     private static PetTypeInfo ResolvePetInfo() {
         var settings = MountainPetModule.Settings;
-        if (settings == null) return PetRegistry.GetPet("axolotl");
-
-        string petId = settings.SelectedPetType switch {
-            PetType.Axolotl => "axolotl",
-            PetType.Goldfish => "fish",
-            _ => "axolotl"
-        };
+        string petId = settings?.SelectedPetId ?? "axolotl";
         return PetRegistry.GetPet(petId);
     }
 
-    private static string ResolveSpriteBankId() {
+    private static PetColorInfo ResolveColor(PetTypeInfo pet) {
         var settings = MountainPetModule.Settings;
-        var pet = ResolvePetInfo();
 
-        // Find the color by folder name from settings
-        string colorFolder = settings?.SelectedColorFolder ?? "";
-        PetColorInfo color = null;
-        foreach (var c in pet.Colors) {
-            if (c.Folder == colorFolder) {
-                color = c;
-                break;
-            }
+        // If randomize is enabled and the pet has multiple colors, pick a different one
+        if (settings?.RandomizeColor == true && pet.Colors.Count > 1) {
+            string lastFolder = settings.SelectedColorFolder ?? "";
+            int index;
+            do {
+                index = Calc.Random.Next(pet.Colors.Count);
+            } while (pet.Colors[index].Folder == lastFolder);
+
+            // Store the chosen color so next spawn avoids it
+            settings.SelectedColorFolder = pet.Colors[index].Folder;
+            return pet.Colors[index];
         }
-        // Fallback to first color if not found
-        color ??= pet.Colors[0];
 
-        return PetRegistry.GetSpriteBankId(pet, color);
+        string colorFolder = settings?.SelectedColorFolder ?? "";
+
+        foreach (var c in pet.Colors) {
+            if (c.Folder == colorFolder)
+                return c;
+        }
+        return pet.Colors[0];
     }
 
     public override void Added(Scene scene) {
@@ -117,12 +117,12 @@ public class AxolotlPet : Entity {
             case PetAnimState.Rest:
                 if (isMoving) {
                     currentDir = ClassifyCardinal(velocity);
-                    if (petInfo.HasTransition && petInfo.TransitionAnimPath != null) {
+                    if (petInfo.HasTransition && petInfo.TransitionAnimPath != null
+                        && sprite.Animations.ContainsKey(petInfo.TransitionAnimPath)) {
                         animState = PetAnimState.TransitionToSwim;
                         sprite.Play(petInfo.TransitionAnimPath);
                         ApplyFlip(currentDir);
                     } else {
-                        // No transition animation — go straight to swimming
                         animState = PetAnimState.Swimming;
                         PlaySwimAnim(currentDir);
                     }
@@ -164,11 +164,13 @@ public class AxolotlPet : Entity {
     }
 
     private void PlaySwimAnim(CardinalDir dir) {
-        // Resolve the best available animation for this direction
         string animId = PetRegistry.ResolveAnimation(petInfo, dir);
 
-        if (sprite.CurrentAnimationID != animId)
-            sprite.Play(animId);
+        // Safety: only play if the animation was actually registered on this sprite
+        if (sprite.Animations.ContainsKey(animId)) {
+            if (sprite.CurrentAnimationID != animId)
+                sprite.Play(animId);
+        }
 
         ApplyFlip(dir);
     }
@@ -178,17 +180,27 @@ public class AxolotlPet : Entity {
     }
 
     public static CardinalDir ClassifyCardinal(Vector2 velocity) {
+        // Clock-style: 0°=N, 90°=E, 180°=S, 270°=W
         float angle = MathF.Atan2(velocity.X, -velocity.Y) * (180f / MathF.PI);
         if (angle < 0) angle += 360f;
 
-        if (angle >= 337.5f || angle < 22.5f) return CardinalDir.N;
-        if (angle >= 22.5f && angle < 67.5f) return CardinalDir.NE;
-        if (angle >= 67.5f && angle < 112.5f) return CardinalDir.E;
-        if (angle >= 112.5f && angle < 157.5f) return CardinalDir.SE;
-        if (angle >= 157.5f && angle < 202.5f) return CardinalDir.S;
-        if (angle >= 202.5f && angle < 247.5f) return CardinalDir.SW;
-        if (angle >= 247.5f && angle < 292.5f) return CardinalDir.W;
-        return CardinalDir.NW;
+        // 16 sectors of 22.5° each
+        if (angle >= 348.75f || angle < 11.25f) return CardinalDir.N;
+        if (angle >= 11.25f && angle < 33.75f) return CardinalDir.NNE;
+        if (angle >= 33.75f && angle < 56.25f) return CardinalDir.NE;
+        if (angle >= 56.25f && angle < 78.75f) return CardinalDir.NEE;
+        if (angle >= 78.75f && angle < 101.25f) return CardinalDir.E;
+        if (angle >= 101.25f && angle < 123.75f) return CardinalDir.SEE;
+        if (angle >= 123.75f && angle < 146.25f) return CardinalDir.SE;
+        if (angle >= 146.25f && angle < 168.75f) return CardinalDir.SSE;
+        if (angle >= 168.75f && angle < 191.25f) return CardinalDir.S;
+        if (angle >= 191.25f && angle < 213.75f) return CardinalDir.SSW;
+        if (angle >= 213.75f && angle < 236.25f) return CardinalDir.SW;
+        if (angle >= 236.25f && angle < 258.75f) return CardinalDir.SWW;
+        if (angle >= 258.75f && angle < 281.25f) return CardinalDir.W;
+        if (angle >= 281.25f && angle < 303.75f) return CardinalDir.NWW;
+        if (angle >= 303.75f && angle < 326.25f) return CardinalDir.NW;
+        return CardinalDir.NNW; // 326.25 - 348.75
     }
 
     public void ResetVelocityTracking() {
