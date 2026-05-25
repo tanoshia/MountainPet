@@ -235,12 +235,15 @@ public class AxolotlPet : Entity {
                 sprite.Play("idle");
             }
             // Still flip the idle sprite to face toward the player
+            // and sync displayAngle so smooth turning starts from the correct direction
             if (playerForDist != null) {
                 Vector2 toPlayer = playerForDist.Position - Position;
                 if (MathF.Abs(toPlayer.X) > 1f) {
                     // Face toward the player
                     CardinalDir facingDir = ClassifyCardinal(toPlayer);
                     ApplyFlip(facingDir);
+                    // Sync displayAngle so movement starts from this direction
+                    displayAngle = VelocityToAngle(toPlayer);
                 }
             }
             // Decay arc offset when stopped

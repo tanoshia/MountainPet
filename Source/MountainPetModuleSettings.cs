@@ -30,7 +30,7 @@ public class MountainPetModuleSettings : EverestModuleSettings {
 
     // Follow behavior
     [SettingIgnore]
-    public int MinMoveDistance { get; set; } = 28;  // min px from player before pet reacts
+    public int MinMoveDistance { get; set; } = 20;  // min px from player before pet reacts
 
     // Smooth turning settings
     [SettingIgnore]

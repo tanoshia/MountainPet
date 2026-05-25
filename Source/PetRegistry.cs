@@ -439,4 +439,25 @@ public static class PetRegistry {
             }
         });
     }
+
+    // Check above for examples, remove the "//" after filling this out and adding images
+    // private static void RegisterYourPet() {
+    //     AllPets.Add(new PetTypeInfo {
+    //         Id = "yourpet",              // Internal ID
+    //         Name = "Your Pet",           // Display name in menu
+    //         Folder = "yourpet",          // Folder name under objects/MountainPet/
+    //         Facing = "west",             // "west", "east", or "full"
+    //         HasTransition = false,       // true if you have idle_to_W frames
+    //         TransitionAnimPath = null,   // "idle_to_W" if HasTransition is true
+    //         Animations = new HashSet<string> { "idle", "W" },
+    //         AnimationDefs = new Dictionary<string, AnimationDef> {
+    //             ["idle"] = new() { Path = "idle", Frames = new[] {0, 1}, Delay = 0.5f },
+    //             ["W"] = new() { Path = "W", Frames = new[] {0, 1, 2, 3}, Delay = 0.08f },
+    //         },
+    //         Colors = new List<PetColorInfo> {
+    //             new() { Folder = "color_red", Name = "Red" },
+    //             new() { Folder = "color_blue", Name = "Blue" },
+    //         }
+    //     });
+    // }
 }

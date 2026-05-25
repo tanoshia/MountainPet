@@ -132,7 +132,7 @@ public class MountainPetModule : EverestModule {
             }));
 
         // Min Follow Distance — top-level setting (not in Advanced)
-        menu.Add(new TextMenu.Slider("Min Follow Distance (default 28)",
+        menu.Add(new TextMenu.Slider("Min Follow Distance (default 20)",
             i => $"{i}px", 12, 48, Settings.MinMoveDistance)
             .Change(val => { Settings.MinMoveDistance = val; }));
 
@@ -199,12 +199,12 @@ public class MountainPetModule : EverestModule {
                 item.Visible = false;
         }
 
-        // The clickable "Advanced" button
+        // The clickable "Experimental" button
         var advancedButton = new TextMenu.Button(
-            Settings.AdvancedExpanded ? "Advanced \u25b2" : "Advanced \u25bc");
+            Settings.AdvancedExpanded ? "Experimental \u25b2" : "Experimental \u25bc");
         advancedButton.Pressed(() => {
             Settings.AdvancedExpanded = !Settings.AdvancedExpanded;
-            advancedButton.Label = Settings.AdvancedExpanded ? "Advanced \u25b2" : "Advanced \u25bc";
+            advancedButton.Label = Settings.AdvancedExpanded ? "Experimental \u25b2" : "Experimental \u25bc";
 
             if (Settings.AdvancedExpanded) {
                 // Show all top-level advanced items

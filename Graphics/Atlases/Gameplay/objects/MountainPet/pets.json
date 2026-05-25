@@ -1,5 +1,5 @@
 {
-  "_note": "This file is REFERENCE ONLY. The actual registry is hardcoded in Source/PetRegistry.cs. Edit that file to change pet definitions.",
+  "_note": "This file is loaded at runtime by PetRegistry. Edit this OR Source/PetRegistry.cs (hardcoded fallback) to change pet definitions.",
   "pets": [
     {
       "id": "axolotl",
