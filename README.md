@@ -125,3 +125,10 @@ Or build in Release mode: `dotnet build -c Release` (triggers the PackageMod tar
 - The mod uses Celeste's native `Leader`/`Follower` system for positioning.
 - Position freeze overrides the follower system when the pet is within min follow distance.
 - All visual effects (nudge, arc offset) are sprite offsets — the entity position follows the vanilla trail.
+
+---
+
+## Credits
+
+- Axolotl art/sprites by [Pop Shop Packs](https://pop-shop-packs.itch.io/)
+- Death animation adapted from [Pet Strawberry](https://gamebanana.com/mods/435133) by kuksa

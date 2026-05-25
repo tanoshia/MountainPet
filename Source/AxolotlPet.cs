@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -23,6 +24,7 @@ public class AxolotlPet : Entity {
 
     // Pet type info (resolved at spawn from settings + registry)
     private PetTypeInfo petInfo;
+    private bool isDying = false;
 
     // Animation state
     private Vector2 lastPosition;
@@ -124,6 +126,9 @@ public class AxolotlPet : Entity {
 
     public override void Update() {
         base.Update();
+
+        // Skip all movement/animation logic while dying
+        if (isDying) return;
 
         if (follower.Leader == null) {
             AttachToPlayer();
@@ -448,5 +453,49 @@ public class AxolotlPet : Entity {
             followers.Remove(follower);
             followers.Insert(0, follower);
         }
+    }
+
+    /// <summary>
+    /// Triggers the pet death animation (called when the player dies).
+    /// </summary>
+    public void Kill() {
+        if (isDying) return;
+        isDying = true;
+        Add(new Coroutine(DeathAnimation()));
+    }
+
+    private IEnumerator DeathAnimation() {
+        // Detach from follower chain so the pet stays in place
+        if (follower.Leader != null) {
+            follower.Leader.LoseFollower(follower);
+        }
+
+        // Brief pause before the burst (pet "reacts" to death)
+        yield return 0.05f;
+
+        // Hide the sprite
+        sprite.Visible = false;
+
+        // Add the expanding death burst effect
+        var deathColor = GetPetColor();
+        Add(new PetDeathEffect(deathColor, Center - Position) {
+            OnEnd = () => RemoveSelf()
+        });
+
+        // Displacement burst (subtle screen warp)
+        SceneAs<Level>()?.Displacement.AddBurst(Center, 0.2f, 4f, 32f, 0.4f);
+    }
+
+    /// <summary>
+    /// Returns a representative color for the current pet (used for death effect tinting).
+    /// </summary>
+    private Color GetPetColor() {
+        // Use a color based on the pet type for a nice tint
+        return petInfo.Id switch {
+            "axolotl" => new Color(255, 150, 180),  // Soft pink
+            "fish" => new Color(255, 180, 80),       // Gold
+            "luma" => new Color(255, 255, 150),      // Warm yellow
+            _ => Color.White
+        };
     }
 }

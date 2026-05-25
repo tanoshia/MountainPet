@@ -25,12 +25,14 @@ public class MountainPetModule : EverestModule {
 
         Everest.Events.Level.OnLoadLevel += OnLoadLevel;
         Everest.Events.Level.OnTransitionTo += OnTransitionTo;
+        Everest.Events.Player.OnDie += OnPlayerDie;
         On.Celeste.Leader.GainFollower += OnLeaderGainFollower;
     }
 
     public override void Unload() {
         Everest.Events.Level.OnLoadLevel -= OnLoadLevel;
         Everest.Events.Level.OnTransitionTo -= OnTransitionTo;
+        Everest.Events.Player.OnDie -= OnPlayerDie;
         On.Celeste.Leader.GainFollower -= OnLeaderGainFollower;
     }
 
@@ -236,6 +238,11 @@ public class MountainPetModule : EverestModule {
             return;
 
         level.Add(new AxolotlPet());
+    }
+
+    private void OnPlayerDie(Player player) {
+        var pet = player.Scene?.Tracker.GetEntity<AxolotlPet>();
+        pet?.Kill();
     }
 
     private void OnTransitionTo(Level level, LevelData next, Vector2 direction) {
