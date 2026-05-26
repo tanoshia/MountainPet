@@ -135,12 +135,15 @@ public class AxolotlPet : Entity {
         }
 
         // Min move distance: pet freezes in place until player is at least this far away
-        float minDist = MountainPetModule.Settings?.MinMoveDistance ?? 28f;
+        // Value of 0 means disabled (use game default follower behavior)
+        // Also disabled during cutscenes so the pet follows naturally
+        float minDist = MountainPetModule.Settings?.MinMoveDistance ?? 20;
+        bool inCutscene = (Scene as Level)?.InCutscene == true;
         Player playerForDist = Scene?.Tracker.GetEntity<Player>();
         float distToPlayer = playerForDist != null ? (playerForDist.Position - Position).Length() : float.MaxValue;
 
-        // Position freeze logic
-        if (distToPlayer < minDist) {
+        // Position freeze logic (disabled when minDist is 0 or during cutscenes)
+        if (minDist > 0 && !inCutscene && distToPlayer < minDist) {
             if (!isHeld) {
                 // Start holding — remember where we are
                 isHeld = true;

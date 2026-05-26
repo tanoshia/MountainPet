@@ -134,8 +134,9 @@ public class MountainPetModule : EverestModule {
             }));
 
         // Min Follow Distance — top-level setting (not in Advanced)
+        // Value of 0 means "Off" (use game default follower behavior, no freeze)
         menu.Add(new TextMenu.Slider("Min Follow Distance (default 20)",
-            i => $"{i}px", 12, 48, Settings.MinMoveDistance)
+            i => i == 0 ? "Off" : $"{i}px", 0, 48, Settings.MinMoveDistance)
             .Change(val => { Settings.MinMoveDistance = val; }));
 
         // === Advanced section (clickable expand/collapse) ===
