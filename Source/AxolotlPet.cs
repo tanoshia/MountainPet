@@ -46,6 +46,10 @@ public class AxolotlPet : Entity {
     private float arcOffsetY = 0f;
     private const float ArcDecayRate = 6f; // How fast arc offset decays back to zero
 
+    // Pet light (mirrors Player's VertexLight approach)
+    private VertexLight light;
+    private static readonly Vector2 LightOffset = Vector2.Zero; // entity origin = sprite center
+
     // Read from settings (with fallback defaults)
     private float NudgeMaxDistance => MountainPetModule.Settings?.NudgeMaxDistance ?? 24f;
     private float NudgeMaxOffset => MountainPetModule.Settings?.NudgeMaxOffset ?? 10f;
@@ -81,9 +85,11 @@ public class AxolotlPet : Entity {
         sprite.OnFinish = OnAnimationFinish;
         Add(sprite);
 
-        // Add light if setting is enabled
+        // Add light if setting is enabled (mirrors Player: stored reference + offset)
+        // Radii reduced to 3/4 of Player's (16, 32 vs 32, 64) for subtler effect
         if (MountainPetModule.Settings?.PetLight == true) {
-            Add(new VertexLight(Color.White, 1f, 32, 64));
+            light = new VertexLight(LightOffset, Color.White, 1f, 16, 32);
+            Add(light);
         }
     }
 
@@ -267,6 +273,20 @@ public class AxolotlPet : Entity {
         // Combine arc offset with nudge offset
         sprite.X = lateralNudge + arcOffsetX;
         sprite.Y = verticalNudge + arcOffsetY;
+
+        // Update light position: snap to pixel grid to prevent sub-pixel flicker.
+        // The entity Position is a float from the follower system, so the light's world pos
+        // (Entity.Position + light.Position) can land on sub-pixels, causing lighting edge
+        // recalculations against walls each frame. We compensate by subtracting the fractional
+        // part of Position, effectively snapping the light to the nearest whole pixel.
+        if (light != null) {
+            float fracX = Position.X - MathF.Floor(Position.X);
+            float fracY = Position.Y - MathF.Floor(Position.Y);
+            light.Position = new Vector2(
+                LightOffset.X - fracX,
+                LightOffset.Y - fracY
+            );
+        }
     }
 
     private void ApplyProximityNudge() {
