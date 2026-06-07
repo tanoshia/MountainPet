@@ -1,5 +1,5 @@
 - Name: Mountain Pet
-  Version: 1.1.2
+  Version: 1.1.3
   DLL: bin/MountainPet.dll
   Dependencies:
     - Name: EverestCore

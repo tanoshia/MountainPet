@@ -27,6 +27,7 @@ public class MountainPetModule : EverestModule {
         Everest.Events.Level.OnTransitionTo += OnTransitionTo;
         Everest.Events.Player.OnDie += OnPlayerDie;
         On.Celeste.Leader.GainFollower += OnLeaderGainFollower;
+        On.Celeste.Leader.Update += OnLeaderUpdate;
     }
 
     public override void Unload() {
@@ -34,6 +35,7 @@ public class MountainPetModule : EverestModule {
         Everest.Events.Level.OnTransitionTo -= OnTransitionTo;
         Everest.Events.Player.OnDie -= OnPlayerDie;
         On.Celeste.Leader.GainFollower -= OnLeaderGainFollower;
+        On.Celeste.Leader.Update -= OnLeaderUpdate;
     }
 
     public override void CreateModMenuSection(TextMenu menu, bool inGame, FMOD.Studio.EventInstance snapshot) {
@@ -133,10 +135,9 @@ public class MountainPetModule : EverestModule {
                 Settings.PetLight = val;
             }));
 
-        // Min Follow Distance — top-level setting (not in Advanced)
-        // Value of 0 means "Off" (use game default follower behavior, no freeze)
-        menu.Add(new TextMenu.Slider("Min Follow Distance (default 20)",
-            i => i == 0 ? "Off" : $"{i}px", 0, 48, Settings.MinMoveDistance)
+        // Follow Distance — directly maps to PastPoints index (how far back in the trail)
+        menu.Add(new TextMenu.Slider("Follow Distance (default 8)",
+            i => $"{i}", 5, 15, Settings.MinMoveDistance)
             .Change(val => { Settings.MinMoveDistance = val; }));
 
         // === Advanced section (clickable expand/collapse) ===
@@ -267,6 +268,44 @@ public class MountainPetModule : EverestModule {
                     }
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Replaces Leader.Update to shift the PastPoints starting index for the entire follower chain.
+    /// Original uses index starting at 5, incrementing by 5 per follower.
+    /// We start at the configured followIndex instead, pushing the whole chain further back.
+    /// </summary>
+#pragma warning disable CL0003 // Intentionally not calling orig — we replicate full Leader.Update logic
+    private static void OnLeaderUpdate(On.Celeste.Leader.orig_Update orig, Leader self) {
+#pragma warning restore CL0003
+        // Let the base Component.Update run (handles PastPoints recording)
+        // We replicate the full Leader.Update logic with our custom starting index.
+
+        // Record position into PastPoints (same as original)
+        Vector2 position = self.Entity.Position + self.Position;
+        if (self.Entity.Scene.OnInterval(0.02f) && (self.PastPoints.Count == 0 || (position - self.PastPoints[0]).Length() >= 3f)) {
+            self.PastPoints.Insert(0, position);
+            if (self.PastPoints.Count > 350) {
+                self.PastPoints.RemoveAt(self.PastPoints.Count - 1);
+            }
+        }
+
+        // Move followers — use our custom starting index
+        int followIndex = Settings?.MinMoveDistance ?? 8;
+        bool inCutscene = (self.Entity?.Scene as Level)?.InCutscene == true;
+        int startIndex = (followIndex > 5 && !inCutscene) ? followIndex : 5;
+
+        int num = startIndex;
+        foreach (Follower follower in self.Followers) {
+            if (num >= self.PastPoints.Count) {
+                break;
+            }
+            Vector2 target = self.PastPoints[num];
+            if (follower.DelayTimer <= 0f && follower.MoveTowardsLeader) {
+                follower.Entity.Position = follower.Entity.Position + (target - follower.Entity.Position) * (1f - (float)Math.Pow(0.01, (double)Engine.DeltaTime));
+            }
+            num += 5;
         }
     }
 }

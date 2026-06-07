@@ -32,10 +32,6 @@ public class AxolotlPet : Entity {
     private CardinalDir currentDir = CardinalDir.W;
     private const float BaseMoveThreshold = 0.3f;
 
-    // Position freeze: hold pet in place until player exceeds min follow distance
-    private bool isHeld = false;
-    private Vector2 heldPosition;
-
     // Lateral nudge: pushes sprite to the side when pet is directly above/below player
     private float lateralNudge = 0f;
     private float verticalNudge = 0f;
@@ -140,35 +136,15 @@ public class AxolotlPet : Entity {
             AttachToPlayer();
         }
 
-        // Min move distance: pet freezes in place until player is at least this far away
-        // Value of 0 means disabled (use game default follower behavior)
-        // Also disabled during cutscenes so the pet follows naturally
-        float minDist = MountainPetModule.Settings?.MinMoveDistance ?? 20;
-        bool inCutscene = (Scene as Level)?.InCutscene == true;
+        // Follow distance is handled by the Leader.Update hook in MountainPetModule.
+        // The hook shifts the PastPoints starting index for ALL followers, keeping the
+        // chain properly spaced. The pet just uses the normal follower system here.
         Player playerForDist = Scene?.Tracker.GetEntity<Player>();
         float distToPlayer = playerForDist != null ? (playerForDist.Position - Position).Length() : float.MaxValue;
 
-        // Position freeze logic (disabled when minDist is 0 or during cutscenes)
-        if (minDist > 0 && !inCutscene && distToPlayer < minDist) {
-            if (!isHeld) {
-                // Start holding — remember where we are
-                isHeld = true;
-                heldPosition = Position;
-            }
-            // Snap back to held position (override follower system)
-            Position = heldPosition;
-        } else {
-            // Player is far enough — release the hold
-            isHeld = false;
-        }
-
-        // Recalculate distance after potential position override
-        if (playerForDist != null)
-            distToPlayer = (playerForDist.Position - Position).Length();
-
         Vector2 velocity = Position - lastPosition;
         float speed = velocity.Length();
-        bool isMoving = speed >= BaseMoveThreshold && !isHeld;
+        bool isMoving = speed >= BaseMoveThreshold;
 
         if (isMoving) {
             float targetAngle = VelocityToAngle(velocity);
@@ -252,7 +228,15 @@ public class AxolotlPet : Entity {
             // and sync displayAngle so smooth turning starts from the correct direction
             if (playerForDist != null) {
                 Vector2 toPlayer = playerForDist.Position - Position;
-                if (MathF.Abs(toPlayer.X) > 1f) {
+                // Hysteresis: flip only when player passes the far edge of the sprite
+                // in the opposite direction. For a 16px sprite (8px half-width),
+                // if facing left (FlipX=false for west-facing art), player must go 8px
+                // past center-right to trigger flip, and vice versa.
+                float flipThreshold = 8f; // half sprite width
+                bool playerIsRight = toPlayer.X > flipThreshold;
+                bool playerIsLeft = toPlayer.X < -flipThreshold;
+
+                if (playerIsRight || playerIsLeft) {
                     // Face toward the player
                     CardinalDir facingDir = ClassifyCardinal(toPlayer);
                     ApplyFlip(facingDir);
